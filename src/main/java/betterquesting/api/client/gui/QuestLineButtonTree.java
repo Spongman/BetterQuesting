@@ -21,23 +21,35 @@ public class QuestLineButtonTree
 {
 	private IQuestLine line;
 	private ArrayList<GuiButtonQuestInstance> buttonTree = new ArrayList<GuiButtonQuestInstance>();
-	private int treeW = 0;
-	private int treeH = 0;
+	private int minX = Integer.MAX_VALUE;
+	private int minY = Integer.MAX_VALUE;
+	private int maxX = Integer.MIN_VALUE;
+	private int maxY = Integer.MAX_VALUE;
 	
 	public QuestLineButtonTree(IQuestLine line)
 	{
 		this.line = line;
 		RebuildTree();
 	}
+
+	public int getLeft()
+	{
+		return buttonTree.isEmpty() ? 0 : minX;
+	}
 	
+	public int getTop()
+	{
+		return buttonTree.isEmpty() ? 0 : minY;
+	}
+
 	public int getWidth()
 	{
-		return treeW;
+		return buttonTree.isEmpty() ? 0 : (maxX - minX);
 	}
 	
 	public int getHeight()
 	{
-		return treeH;
+		return buttonTree.isEmpty() ? 0 : (maxY - minY);
 	}
 	
 	public IQuestLine getQuestLine()
@@ -79,8 +91,9 @@ public class QuestLineButtonTree
 	public void RebuildTree()
 	{
 		buttonTree.clear();
-		treeW = 0;
-		treeH = 0;
+		
+		minX = minY = Integer.MAX_VALUE;
+		maxX = maxY = Integer.MIN_VALUE;
 		
 		if(line == null)
 		{
@@ -106,8 +119,10 @@ public class QuestLineButtonTree
 				continue;
 			}
 			
-			treeW = Math.max(btn.x + btn.width, treeW);
-			treeH = Math.max(btn.y + btn.height, treeH);
+			minX = Math.min(minX, btn.x);
+			minY = Math.min(minY, btn.y);
+			maxX = Math.max(maxX, btn.x + btn.width);
+			maxY = Math.max(maxY, btn.y + btn.height);
 			
 			for(GuiButtonQuestInstance b2 : buttonTree)
 			{

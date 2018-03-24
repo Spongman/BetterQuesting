@@ -28,6 +28,8 @@ public class GuiQuestLinesEmbedded extends GuiElement implements IGuiQuestLine
 	private int zoom = 100;
 	private int scrollX = 0;
 	private int scrollY = 0;
+	private int minX = 0;
+	private int minY = 0;
 	private int maxX = 0;
 	private int maxY = 0;
 	private boolean noScroll = false;
@@ -216,20 +218,28 @@ public class GuiQuestLinesEmbedded extends GuiElement implements IGuiQuestLine
 	@Override
 	public void onMouseScroll(int mx, int my, int SDX)
 	{
-        if(SDX != 0 && isWithin(mx, my, posX, posY, sizeX, sizeY))
-        {
-            if(curTool != null)
-            {
-            	curTool.onMouseScroll(getRelativeX(mx), getRelativeY(my), SDX);
-            	
-            	if(!curTool.allowZoom())
-            	{
-            		return; // No zoom for you
-            	}
-            }
-            
-        	setZoom(zoom - SDX*5);
-        }
+		if(SDX != 0 && isWithin(mx, my, posX, posY, sizeX, sizeY))
+		{
+			int rx = getRelativeX(mx);
+			int ry = getRelativeY(my);
+			if(curTool != null)
+			{
+				curTool.onMouseScroll(rx, ry, SDX);
+
+				if(!curTool.allowZoom())
+				{
+					return; // No zoom for you
+				}
+			}
+
+			zoom = MathHelper.clamp(zoom - SDX*5, 50, 200);
+
+			// this is the inverse of getRelativeX
+			scrollX = ((mx - posX) * 100 / zoom) - rx;
+			scrollY = ((my - posY) * 100 / zoom) - ry;
+
+			clampScroll();
+		}
 	}
 	
 	@Override
@@ -238,16 +248,6 @@ public class GuiQuestLinesEmbedded extends GuiElement implements IGuiQuestLine
 		if(curTool != null)
 		{
 			curTool.onKeyPressed(c, key);
-		}
-	}
-	
-	private void setZoom(int value)
-	{
-		zoom = MathHelper.clamp(value, 50, 200);
-		
-		if(curTool == null || !curTool.allowZoom())
-		{
-			clampScroll();
 		}
 	}
 	
@@ -280,15 +280,16 @@ public class GuiQuestLinesEmbedded extends GuiElement implements IGuiQuestLine
 			{
 				setBackground(new ResourceLocation(bgn), bgs);
 			}
-			
-			if(bgImg == null)
+
+			minX = tree.getLeft();
+			minY = tree.getTop();
+			maxX = minX + tree.getWidth();
+			maxY = minY + tree.getHeight();
+
+			if(bgImg != null)
 			{
-				maxX = tree.getWidth();
-				maxY = tree.getHeight();
-			} else
-			{
-				maxX = Math.max(bgSize, tree.getWidth());
-				maxY = Math.max(bgSize, tree.getHeight());
+				maxX = Math.max(bgSize, maxX);
+				maxY = Math.max(bgSize, maxY);
 			}
 			
 			if(resetView)
@@ -333,14 +334,8 @@ public class GuiQuestLinesEmbedded extends GuiElement implements IGuiQuestLine
 	public void clampScroll()
 	{
 		float zs = zoom/100F;
-		int sx2 = (int)(sizeX/zs);
-		int sy2 = (int)(sizeY/zs);
-		int zmx = (int)Math.abs(sx2/2 - (maxX + 32)/2);
-		int zmy = (int)Math.abs(sy2/2 - (maxY + 32)/2);
-		int zox = sx2/2 - (maxX + 32)/2 + 16;
-		int zoy = sy2/2 - (maxY + 32)/2 + 16;
-		scrollX = MathHelper.clamp(scrollX, -zmx + zox, zmx + zox);
-		scrollY = MathHelper.clamp(scrollY, -zmy + zoy, zmy + zoy);
+		scrollX = MathHelper.clamp(scrollX, -(maxX - 12), (int) (sizeX / zs - minX - 12));
+		scrollY = MathHelper.clamp(scrollY, -(maxY - 12), (int) (sizeY / zs - minY - 12));
 	}
 	
 	// Methods below are to assist with editing tools
