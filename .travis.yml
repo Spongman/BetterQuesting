@@ -1,0 +1,19 @@
+language: java
+deploy:
+  skip_cleanup: true
+  provider: releases
+  api_key:
+    secure: w0ZObvGlZXScC2iPf515qoBPb9FpJAI+fjF7BFVvUlVGhXfL+k88OwVonXlwcF0qqHgnCxp37Z8tzbrYVXPuSgvFRQmczWq8G5O5XyUM9wAbZSs4Fiw8UjQt+IIuEsFWiW8Y0TIx2INd/Fky+zjnmss/nJYiP1UsOWsI5Gdu4JqnaHZNCv68ZkqidY9E9XzjD4fLxS1rW9VpJV+JbiIiOLx/usM0pRGndTtfdm0C7YYX24GGeR2OPzIaFWysHEOOqftwCJUrgzycYTIMAyuuA3pFNqLdi30loGox42pMEArirTnOlCPuH4Z88TTlKODFkzAwK3jP0effmo8RlcBoUwPTnVG9Fs/vCh4PFnrnBL9dyYzmuB43mmAftpVkTN1XFMOEOM8WVWmub9Qzb+d+OT7wgMeATkz2Gy6JyZi5aT0up7LnwrEPQosibXcJoKc0kqmDlx3o3tpvVEiC9rvJRwWQJsVBfrDqJCexCBp6+GdmJdtX4CLKXwsJS65UXNYVZJ9yM8vi1lGAo/Q/U8pM9WXMNB59vtfwmHvCKVwk40tzHTi7+7uHsxAj+xXfwp2sLLy4yH+sOd9xLco13RMYaNP8lDDDNe1JYxgE8BuMlnR8m4IT7VIq2RtSbrsO9F/UW8mcSsyfSimilQbTBCdkQIDWjv4DR7mOjOYtm8O9DCg=
+  file_glob: true
+  file: build/libs/*
+  on:
+    all_branches: true
+    repo: Spongman/BetterQuesting
+    
+before_cache:
+- rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
+- rm -fr $HOME/.gradle/caches/*/plugin-resolution/
+cache:
+  directories:
+  - "$HOME/.gradle/caches/"
+  - "$HOME/.gradle/wrapper/"
